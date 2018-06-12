@@ -7,9 +7,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-public interface BookingRepository extends MongoRepository<Ticket,UUID> {
+public interface BookingRepository extends MongoRepository<Ticket, UUID> {
     public List<Ticket> findByPgi(String pgi);
+
     public List<Ticket> findByDate(LocalDate date);
+
     public List<Ticket> findByPlace(String place);
 
 }

@@ -2,6 +2,7 @@ package com.hilst.ts.bookingservice.services;
 
 import com.hilst.ts.bookingservice.model.Ticket;
 import com.hilst.ts.bookingservice.repositories.BookingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -11,8 +12,9 @@ import java.util.UUID;
 
 @Service
 public class BookingService {
-    private BookingRepository repository;
+    private final BookingRepository repository;
 
+    @Autowired
     public BookingService(BookingRepository repository) {
         this.repository = repository;
     }

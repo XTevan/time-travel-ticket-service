@@ -1,4 +1,15 @@
-mongo:
-  database: timetravelticketDB
-  host: 127.0.0.1
-  port: 32769
+spring:
+  application:
+    name: time-travel-ticket-service
+  data:
+    mongodb:
+      database: timetravelticketDB
+      host: 127.0.0.1
+      port: 27017
+      username: root
+      password: shesgotatickettoride
+
+swagger:
+  title: Time Travel Ticket Service
+  description: A service to manage and book time travel tickets
+  version: 0.0.1
