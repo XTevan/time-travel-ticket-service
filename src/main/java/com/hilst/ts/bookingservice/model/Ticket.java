@@ -70,7 +70,7 @@ public class Ticket {
 
     @Override
     public String toString() {
-        return "Ticket{" +
+        return "{" +
                 "pgi='" + pgi + '\'' +
                 ", place='" + place + '\'' +
                 ", date=" + date +

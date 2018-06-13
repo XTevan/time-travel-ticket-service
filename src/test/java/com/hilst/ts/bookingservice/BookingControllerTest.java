@@ -1,5 +1,8 @@
 package com.hilst.ts.bookingservice;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hilst.ts.bookingservice.controller.BookingController;
 import com.hilst.ts.bookingservice.model.Ticket;
 import com.hilst.ts.bookingservice.service.BookingService;
@@ -21,6 +24,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,7 +52,7 @@ public class BookingControllerTest {
         mockMvc.perform(get("/api/3ts")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$", hasSize(TICKETS.size())))
                 .andExpect(jsonPath("$[0].place", is(PLACE)));
         verify(service, times(1)).findAll();
         verifyNoMoreInteractions(service);
@@ -74,6 +78,40 @@ public class BookingControllerTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
         verify(service, times(1)).findById(ID_TICKET);
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    public void bookShouldCallServiceOnce() throws Exception {
+        when(service.save(any(Ticket.class))).thenReturn(TICKET);
+        ObjectMapper serializer = new ObjectMapper();
+        serializer.registerModule(new JavaTimeModule());
+        serializer.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        String jsonBody = serializer.writeValueAsString(TICKET);
+
+
+        mockMvc.perform(post("/api/3ts")
+                .content(jsonBody)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        verify(service, times(1)).save(any(Ticket.class));
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    public void bookShouldCallServiceOnceAndReturnError() throws Exception {
+        when(service.save(any(Ticket.class))).thenReturn(TICKET);
+        ObjectMapper serializer = new ObjectMapper();
+        serializer.registerModule(new JavaTimeModule());
+        serializer.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        String jsonBody = serializer.writeValueAsString(new Ticket());
+
+
+        mockMvc.perform(post("/api/3ts")
+                .content(jsonBody)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+        verify(service, times(0)).save(any(Ticket.class));
         verifyNoMoreInteractions(service);
     }
 
