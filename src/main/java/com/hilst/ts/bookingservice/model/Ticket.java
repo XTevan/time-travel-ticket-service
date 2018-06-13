@@ -22,6 +22,7 @@ public class Ticket {
     private String pgi;
 
     @NotNull(message = "Place can't be null")
+    @Size(min = 5)
     private String place;
     @NotNull(message = "Date can't be null")
     private LocalDate date;

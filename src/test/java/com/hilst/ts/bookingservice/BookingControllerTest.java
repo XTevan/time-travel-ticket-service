@@ -38,11 +38,19 @@ public class BookingControllerTest {
     private static final Ticket TICKET = new Ticket(ID_TICKET, PGI, PLACE, DATE_TICKET);
     private static final List<Ticket> TICKETS = Collections.singletonList(TICKET);
 
+    private ObjectMapper serializer;
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private BookingService service;
+
+    public BookingControllerTest() {
+        serializer = new ObjectMapper();
+        serializer.registerModule(new JavaTimeModule());
+        serializer.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
 
 
     @Test
@@ -84,9 +92,6 @@ public class BookingControllerTest {
     @Test
     public void bookShouldCallServiceOnce() throws Exception {
         when(service.save(any(Ticket.class))).thenReturn(TICKET);
-        ObjectMapper serializer = new ObjectMapper();
-        serializer.registerModule(new JavaTimeModule());
-        serializer.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         String jsonBody = serializer.writeValueAsString(TICKET);
 
 
@@ -101,9 +106,6 @@ public class BookingControllerTest {
     @Test
     public void bookShouldCallServiceOnceAndReturnError() throws Exception {
         when(service.save(any(Ticket.class))).thenReturn(TICKET);
-        ObjectMapper serializer = new ObjectMapper();
-        serializer.registerModule(new JavaTimeModule());
-        serializer.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         String jsonBody = serializer.writeValueAsString(new Ticket());
 
 
@@ -114,5 +116,48 @@ public class BookingControllerTest {
         verify(service, times(0)).save(any(Ticket.class));
         verifyNoMoreInteractions(service);
     }
+
+    @Test
+    public void bookMissingPgiShouldCallServiceOnceAndReturnError() throws Exception {
+        when(service.save(any(Ticket.class))).thenReturn(TICKET);
+        String jsonBody = serializer.writeValueAsString(new Ticket(null, "", PLACE, DATE_TICKET));
+
+
+        mockMvc.perform(post("/api/3ts")
+                .content(jsonBody)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+        verify(service, times(0)).save(any(Ticket.class));
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    public void bookMissingPlaceShouldCallServiceOnceAndReturnError() throws Exception {
+        when(service.save(any(Ticket.class))).thenReturn(TICKET);
+        String jsonBody = serializer.writeValueAsString(new Ticket(null, PGI, null, DATE_TICKET));
+
+
+        mockMvc.perform(post("/api/3ts")
+                .content(jsonBody)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+        verify(service, times(0)).save(any(Ticket.class));
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    public void bookMissingDateShouldCallServiceOnceAndReturnError() throws Exception {
+        when(service.save(any(Ticket.class))).thenReturn(TICKET);
+        String jsonBody = serializer.writeValueAsString(new Ticket(null, PGI, PLACE, null));
+
+
+        mockMvc.perform(post("/api/3ts")
+                .content(jsonBody)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+        verify(service, times(0)).save(any(Ticket.class));
+        verifyNoMoreInteractions(service);
+    }
+
 
 }
