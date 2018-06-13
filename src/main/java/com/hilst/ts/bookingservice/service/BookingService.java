@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class BookingService {
@@ -54,9 +57,9 @@ public class BookingService {
     }
 
     public List<Ticket> findAll() {
-        List<Ticket> result = new ArrayList<>();
-        repository.findAll().forEach(x->result.add(x));
-        return result;
+        return StreamSupport
+                .stream(repository.findAll().spliterator(), true)
+                .collect(Collectors.toList());
     }
 
 }

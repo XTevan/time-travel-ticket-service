@@ -1,9 +1,10 @@
 package com.hilst.ts.bookingservice.model;
 
 
-
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -15,9 +16,9 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message= "Pgi can't be null")
+    @NotNull(message = "Pgi can't be null")
     @Size(min = 5, max = 10, message = "Pgi must have at least 5 and at most 10 chars")
-    @Pattern(regexp = "^[a-zA-Z][\\d|a-zA-Z]{4,9}",message = "Pgi must be alphanumeric, starting with a letter")
+    @Pattern(regexp = "^[a-zA-Z][\\d|a-zA-Z]{4,9}", message = "Pgi must be alphanumeric, starting with a letter")
     private String pgi;
 
     @NotNull(message = "Place can't be null")
@@ -25,7 +26,8 @@ public class Ticket {
     @NotNull(message = "Date can't be null")
     private LocalDate date;
 
-    public Ticket() {}
+    public Ticket() {
+    }
 
     public Ticket(Long id, String pgi, String place, LocalDate date) {
         this.id = id;
