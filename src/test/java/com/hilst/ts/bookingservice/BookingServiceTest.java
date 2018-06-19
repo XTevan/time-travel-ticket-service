@@ -7,6 +7,8 @@ import com.hilst.ts.bookingservice.service.BookingService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -26,18 +28,19 @@ public class BookingServiceTest {
     private static final Ticket TICKET = new Ticket(ID_TICKET, PGI, PLACE, DATE_TICKET);
     private static final List<Ticket> TICKETS = Collections.singletonList(TICKET);
 
-    @MockBean
+    @Mock
     private BookingRepository repository;
 
+    @InjectMocks
     private BookingService service;
 
     @Test
     public void findAllShouldCallRepositoryOnce() {
         when(repository.findAll()).thenReturn(TICKETS);
-        service = new BookingService(repository);
-        List<Ticket> result = service.findAll();
 
-        Assert.assertEquals(result.size(), TICKETS.size());
+        Iterable<Ticket> result = service.findAll();
+
+        Assert.assertEquals(result.spliterator().getExactSizeIfKnown(), TICKETS.size());
         verify(repository, times(1)).findAll();
         verifyNoMoreInteractions(repository);
     }
@@ -45,7 +48,7 @@ public class BookingServiceTest {
     @Test
     public void findByIdShouldCallRepositoryOnceAndReturnModel() {
         when(repository.findById(ID_TICKET)).thenReturn(Optional.of(TICKET));
-        service = new BookingService(repository);
+
         Optional<Ticket> result = service.findById(ID_TICKET);
 
         Assert.assertTrue(result.isPresent());
@@ -57,7 +60,7 @@ public class BookingServiceTest {
     @Test
     public void findByIdShouldCallRepositoryOnceAndReturnEmptyModel() {
         when(repository.findById(ID_TICKET)).thenReturn(Optional.empty());
-        service = new BookingService(repository);
+
         Optional<Ticket> result = service.findById(ID_TICKET);
 
         Assert.assertFalse(result.isPresent());
@@ -70,7 +73,7 @@ public class BookingServiceTest {
         when(repository.save(TICKET)).thenReturn(TICKET);
         when(repository.findByPgiAndPlaceAndDate(TICKET.getPgi(),TICKET.getPlace(),TICKET.getDate())).thenReturn(Optional.empty());
 
-        service = new BookingService(repository);
+
         Ticket result = service.save(TICKET);
 
         Assert.assertNotNull(result);
@@ -85,7 +88,6 @@ public class BookingServiceTest {
         when(repository.save(TICKET)).thenReturn(TICKET);
         when(repository.findByPgiAndPlaceAndDate(TICKET.getPgi(),TICKET.getPlace(),TICKET.getDate())).thenReturn(Optional.of(TICKET));
 
-        service = new BookingService(repository);
         Ticket result = service.save(TICKET);
 
         Assert.assertNotNull(result);

@@ -3,13 +3,13 @@ package com.hilst.ts.bookingservice.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class BookingException extends RuntimeException {
-    public BookingException(String message) {
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class TicketNotFoundException extends RuntimeException {
+    public TicketNotFoundException(String message) {
         super(message);
     }
 
-    public BookingException(String message, Throwable cause) {
+    public TicketNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 }

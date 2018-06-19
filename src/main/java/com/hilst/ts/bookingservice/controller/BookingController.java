@@ -1,10 +1,10 @@
 package com.hilst.ts.bookingservice.controller;
 
+import com.hilst.ts.bookingservice.exception.TicketNotFoundException;
 import com.hilst.ts.bookingservice.model.Ticket;
 import com.hilst.ts.bookingservice.service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,23 +19,20 @@ public class BookingController {
         this.service = service;
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Ticket> findOne(@PathVariable("id") Long id) {
-        return service.findById(id).map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    @GetMapping(value = "/{id}")
+    public Ticket findOne(@PathVariable("id") Long id) {
+        return service.findById(id).orElseThrow(() -> new TicketNotFoundException("Ticket not found"));
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public Collection<Ticket> findAll() {
+    @GetMapping
+    public Iterable<Ticket> findAll() {
         return service.findAll();
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void book(@Valid @RequestBody Ticket ticket) {
-        service.save(ticket);
+    public Ticket book(@Valid @RequestBody Ticket ticket) {
+        return service.save(ticket);
     }
 
 }

@@ -56,10 +56,8 @@ public class BookingService {
         return ticket;
     }
 
-    public List<Ticket> findAll() {
-        return StreamSupport
-                .stream(repository.findAll().spliterator(), true)
-                .collect(Collectors.toList());
+    public Iterable<Ticket> findAll() {
+        return repository.findAll();
     }
 
 }
